@@ -119,9 +119,24 @@ public abstract class FloatViewHolder {
     private void attachView(int width, int height) {
         if (!mViewAdded && mRootView != null && mWindowManager != null) {
             wmParams = new WindowManager.LayoutParams();
-            wmParams.type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < 24 ?
-                    WindowManager.LayoutParams.TYPE_TOAST : WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-            wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                wmParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                // Deprecated in API level 26
+                wmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+            } else {
+                // Deprecated in API level 26
+                wmParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            }
+
+            wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                // Deprecated in API level 30
+                wmParams.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+                // Deprecated in API level 30
+                wmParams.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+            }
             wmParams.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
             wmParams.width = width;
             wmParams.height = height;
